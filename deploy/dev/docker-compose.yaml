@@ -1,0 +1,35 @@
+version: "3.7"
+networks:
+  medical-chain-server:
+    name: ${NETWORK_NAME}
+services:
+  sideservice:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - "../../:/src"
+    ports:
+      - "8080:8080"
+      - "7070:7070"
+    #    depends_on:
+    command:
+      - /bin/sh
+      - -c
+      - |
+        air
+    environment:
+      - CHECK_BODY=true
+      - DISABLE_TRACING=true
+      - DISABLE_PROFILER=true
+      - VERSION=0.0.1
+      - PORT=8080
+      - GRPC_PORT=7070
+      - PPROF_PORT=5050
+      - COSMOS_ENDPOINT=medicalchain:9090
+      - DISABLE_STATS=true
+      - COSMOS_ACCOUNT=
+      - CHAIN_ID=my-test-chain
+    networks:
+      - medical-chain-server

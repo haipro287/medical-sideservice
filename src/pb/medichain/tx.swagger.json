@@ -1,0 +1,90 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "medichain/tx.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "Msg"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "medichainMsgAcceptSharingResponse": {
+      "type": "object"
+    },
+    "medichainMsgCreateServiceResponse": {
+      "type": "object"
+    },
+    "medichainMsgCreateServiceUserResponse": {
+      "type": "object"
+    },
+    "medichainMsgCreateSharingResponse": {
+      "type": "object"
+    },
+    "medichainMsgCreateUserResponse": {
+      "type": "object"
+    },
+    "medichainMsgDeleteServiceResponse": {
+      "type": "object"
+    },
+    "medichainMsgDeleteServiceUserResponse": {
+      "type": "object"
+    },
+    "medichainMsgDeleteSharingResponse": {
+      "type": "object"
+    },
+    "medichainMsgDeleteUserResponse": {
+      "type": "object"
+    },
+    "medichainMsgRejectSharingResponse": {
+      "type": "object"
+    },
+    "medichainMsgUpdateServiceResponse": {
+      "type": "object"
+    },
+    "medichainMsgUpdateServiceUserResponse": {
+      "type": "object"
+    },
+    "medichainMsgUpdateSharingResponse": {
+      "type": "object"
+    },
+    "medichainMsgUpdateUserResponse": {
+      "type": "object"
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}

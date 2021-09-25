@@ -1,0 +1,35 @@
+version: "3.7"
+networks:
+  medical-chain-server:
+    name: medical-chain-server-dev
+services:
+  sideservice:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - "../../:/src"
+    ports:
+      - "8080:8080"
+      - "7070:7070"
+#    depends_on:
+    command:
+      - /bin/sh
+      - -c
+      - |
+        air
+    environment:
+      - CHECK_BODY=true
+      - DISABLE_TRACING=true
+      - DISABLE_PROFILER=true
+      - VERSION=0.0.1
+      - PORT=8080
+      - GRPC_PORT=7070
+      - PPROF_PORT=5050
+      - COSMOS_ENDPOINT=host.docker.internal:9090
+      - CHAIN_ID=medichain
+      - MNEMONIC=marriage goat attend inherit much target rubber orchard decade identify undo come quiz judge quarter road rocket bachelor flat truck credit fuel there decade
+      - DISABLE_STATS=true
+    networks:
+      - medical-chain-server
