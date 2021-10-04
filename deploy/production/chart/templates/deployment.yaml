@@ -39,6 +39,8 @@ spec:
             name: "{{ .Values.service.name |initials }}-grpc"
           - containerPort: {{ .Values.services.pprofPort | default "3000" }}
             name: "{{ .Values.service.name | initials }}-prof"
+          - containerPort: {{ .Values.services.port | default "11221"}}
+            name: http
         env:
           - name: CHECK_BODY
             value: {{ .Values.services.checkBody | default true | quote }}
