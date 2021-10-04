@@ -15,6 +15,7 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	github.com/sonntuet1997/medical-chain-utils v0.1.1
 	github.com/tendermint/spm v0.1.2
+	github.com/tendermint/tendermint v0.34.13 // indirect
 	github.com/urfave/cli/v2 v2.3.0
 	go.opencensus.io v0.23.0
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1

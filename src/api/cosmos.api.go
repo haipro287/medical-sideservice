@@ -69,59 +69,43 @@ func (c *CosmosApi) HandleServiceUserPost(g *gin.Context) {
 	msg64 := g.Query("message")
 	serviceUser := g.Query("serviceUser")
 
+	var msg pb.Message
 	decMsg, err := base64.RawURLEncoding.DecodeString(msg64)
 	if err != nil {
 		response.ErrBadRequest(g, err)
 		return
 	}
-
-	var msg pb.Message
 	err = json.Unmarshal(decMsg, &msg)
 	if err != nil {
 		response.ErrBadRequest(g, err)
 		return
 	}
 
-	verified, err := c.cosmosService.Verify(msg.Message, msg.Signature, msg.PubKey)
+	var req types.MsgCreateServiceUser
+	err = json.Unmarshal([]byte(msg.Message), &req)
+	if err != nil {
+		response.ErrBadRequest(g, err)
+		return
+	}
+
+	verified, err := c.cosmosService.Verify(msg.Message, msg.Signature, req.UserId)
 	if err != nil || !verified {
 		response.ErrUnauthorized(g, err)
 		return
 	}
 
-	decReq, err := base64.RawURLEncoding.DecodeString(msg.Message)
-	if err != nil {
-		response.ErrBadRequest(g, err)
-		return
-	}
-
-	logrus.Info(string(decReq))
-
-	var req types.MsgCreateServiceUser
-
-	err = json.Unmarshal(decReq, &req)
-	if err != nil {
-		response.ErrBadRequest(g, err)
-		return
-	}
-
-	logrus.Info(req)
-
 	req.ServiceUserId = serviceUser
-
 	info, err := c.cosmosService.ShowAccount("admin")
 	if err != nil {
 		response.ErrBadRequest(g, err)
 		return
 	}
-
 	bech32addr, err := sdk.Bech32ifyAddressBytes("medichain", info.GetAddress().Bytes())
 	if err != nil {
 		response.ErrBadRequest(g, err)
 		return
 	}
-
 	req.Creator = bech32addr
-
 	if err := req.ValidateBasic(); err != nil {
 		c.logger.Errorf("error: %v", err)
 	}
@@ -139,40 +123,32 @@ func (c *CosmosApi) HandleServiceUserPost(g *gin.Context) {
 func (c *CosmosApi) HandleCheckSharingGet(g *gin.Context) {
 	msg64 := g.Query("message")
 
+	var msg pb.Message
 	decMsg, err := base64.RawURLEncoding.DecodeString(msg64)
 	if err != nil {
 		response.ErrBadRequest(g, err)
 		return
 	}
-
-	var msg pb.Message
 	err = json.Unmarshal(decMsg, &msg)
 	if err != nil {
 		response.ErrBadRequest(g, err)
 		return
 	}
 
-	verified, err := c.cosmosService.Verify(msg.Message, msg.Signature, msg.PubKey)
+	var req types.QueryCheckSharingRequest
+	err = json.Unmarshal([]byte(msg.Message), &req)
+	if err != nil {
+		response.ErrBadRequest(g, err)
+		return
+	}
+
+	verified, err := c.cosmosService.Verify(msg.Message, msg.Signature, req.ViewerId)
 	if err != nil || !verified {
 		response.ErrUnauthorized(g, err)
 		return
 	}
 
-	decReq, err := base64.RawURLEncoding.DecodeString(msg.Message)
-	if err != nil {
-		response.ErrBadRequest(g, err)
-		return
-	}
-
-	var req types.QueryCheckSharingRequest
-	err = json.Unmarshal(decReq, &req)
-	if err != nil {
-		response.ErrBadRequest(g, err)
-		return
-	}
-
 	res, err := c.cosmosService.GetCheckSharing(&req)
-
 	if err != nil {
 		response.ErrInternalServerError(g, err)
 		return

@@ -10,6 +10,7 @@ import (
 	"github.com/sonntuet1997/medical-chain-utils/common"
 	"github.com/sonntuet1997/medical-chain-utils/common_service"
 	pb2 "github.com/sonntuet1997/medical-chain-utils/common_service/pb"
+	"github.com/sonntuet1997/medical-chain-utils/cryptography"
 	api2 "github.com/sotanext-team/medical-chain/src/sideservice/src/api"
 	"github.com/sotanext-team/medical-chain/src/sideservice/src/services"
 	"github.com/tendermint/spm/cosmoscmd"
@@ -92,7 +93,8 @@ func runMain(appCtx *cli.Context) error {
 		cosmoscmd.SetPrefixes("medichain")
 		unsafeKeyring := keyring.NewUnsafe(keyring.NewInMemory())
 		cosmosService := services.NewCosmosService(ctx, unsafeKeyring, appCtx.String("chain-id"), appCtx.String("cosmos-endpoint"))
-		_, err := cosmosService.AddAccountFromMnemonic("admin", appCtx.String("mnemonic"))
+		res, err := cosmosService.AddAccountFromMnemonic("admin", appCtx.String("mnemonic"))
+		logrus.Info(cryptography.ConvertBytesToBase64(res.GetPubKey().Bytes()))
 		if err != nil {
 			logger.Errorf("error while adding admin mnemonic: %v", err)
 		}

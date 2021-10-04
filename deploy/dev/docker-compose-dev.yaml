@@ -29,7 +29,7 @@ services:
       - PPROF_PORT=5050
       - COSMOS_ENDPOINT=host.docker.internal:9090
       - CHAIN_ID=medichain
-      - MNEMONIC=marriage goat attend inherit much target rubber orchard decade identify undo come quiz judge quarter road rocket bachelor flat truck credit fuel there decade
+      - MNEMONIC=hotel sword swarm scissors desk chase illegal idea noise humble track orient spare nurse dad insect agent prison learn polar talk soccer sadness above
       - DISABLE_STATS=true
     networks:
       - medical-chain-server

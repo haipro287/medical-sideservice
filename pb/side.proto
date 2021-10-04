@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package medical_chain;
+import "google/api/http.proto";
+import "google/api/annotations.proto";
+option go_package = "./pb";
+
+message Message {
+  string message = 1;
+  string signature = 2;
+  string pubKey = 3;
+}
+
+message ErrorMessage {
+  string message = 1;
+}
+
+

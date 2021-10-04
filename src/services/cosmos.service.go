@@ -132,19 +132,12 @@ func (s *CosmosService) GetAccount(address string) (*types3.BaseAccount, error) 
 }
 
 func (s *CosmosService) PostCreateServiceUser(req *types.MsgCreateServiceUser) (*txtypes.BroadcastTxResponse, error) {
-	adminPrivStr, err := s.keyring.UnsafeExportPrivKeyHex("admin")
+	adminPriv, err := s.getAdminKey()
 	if err != nil {
 		message := status.Convert(err).Message()
 		return nil, xerrors.New(message)
 	}
-
-	adminPrivBz, err := hex.DecodeString(adminPrivStr)
-	if err != nil {
-		message := status.Convert(err).Message()
-		return nil, xerrors.New(message)
-	}
-	adminPriv := secp256k1.PrivKey{Key: adminPrivBz}
-	privs := []types2.PrivKey{&adminPriv}
+	privs := []types2.PrivKey{adminPriv}
 
 	res, err := s.sendTx(req, privs)
 	if err != nil {
@@ -155,11 +148,26 @@ func (s *CosmosService) PostCreateServiceUser(req *types.MsgCreateServiceUser) (
 }
 
 func (s *CosmosService) AddAccountFromMnemonic(uid string, mnemonic string) (keyring.Info, error) {
-	return s.keyring.NewAccount(uid, mnemonic, "", "", hd.Secp256k1)
+	return s.keyring.NewAccount(uid, mnemonic, "", "m/44'/118'/0'/0", hd.Secp256k1)
 }
 
 func (s *CosmosService) ShowAccount(uid string) (keyring.Info, error) {
 	return s.keyring.Key(uid)
+}
+
+func (s *CosmosService) getAdminKey() (*secp256k1.PrivKey, error) {
+	adminPrivStr, err := s.keyring.UnsafeExportPrivKeyHex("admin")
+	if err != nil {
+		return nil, err
+	}
+
+	adminPrivBz, err := hex.DecodeString(adminPrivStr)
+	if err != nil {
+		return nil, err
+	}
+	adminPriv := secp256k1.PrivKey{Key: adminPrivBz}
+
+	return &adminPriv, nil
 }
 
 func (s *CosmosService) sendTx(msg sdk.Msg, privs []types2.PrivKey) (*txtypes.BroadcastTxResponse, error) {
@@ -172,13 +180,11 @@ func (s *CosmosService) sendTx(msg sdk.Msg, privs []types2.PrivKey) (*txtypes.Br
 			message := status.Convert(err).Message()
 			return nil, xerrors.New(message)
 		}
-		logrus.Info(addr)
 		acc, err := s.GetAccount(addr)
 		if err != nil {
 			message := status.Convert(err).Message()
 			return nil, xerrors.New(message)
 		}
-		logrus.Info(acc)
 		accs = append(accs, acc)
 	}
 
@@ -255,14 +261,15 @@ func (s *CosmosService) sendTx(msg sdk.Msg, privs []types2.PrivKey) (*txtypes.Br
 		return nil, xerrors.New(message)
 	}
 
+	if txRes.TxResponse.Logs == nil && txRes.TxResponse.Code != 0 {
+		message := txRes.TxResponse.RawLog
+		return nil, xerrors.New(message)
+	}
+
 	return txRes, nil
 }
 
 func (s *CosmosService) Sign(msg string, key string) ([]byte, error) {
-
-	//key64 := "ggR2Oy+S8Imls539nCBu+T9Rv8NO9JHTxuFOK75nOpA="
-	//logrus.Info(key64)
-
 	keyBz, err := cryptography.ConvertBase64ToBytes(key)
 	if err != nil {
 		message := status.Convert(err).Message()
@@ -280,22 +287,23 @@ func (s *CosmosService) Sign(msg string, key string) ([]byte, error) {
 	return sig, nil
 }
 
-func (s *CosmosService) Verify(msg string, sig string, pubKey string) (bool, error) {
-
-	//pubKey64 := "A8SmZkaxqfKKjC6JoxQ/0o9WSG0D9clAuxrHniut0l52"
-	//logrus.Info(pubKey64)
-	pubKeyBz, err := cryptography.ConvertBase64ToBytes(pubKey)
+func (s *CosmosService) Verify(msg string, sig string, userId string) (bool, error) {
+	userReq := types.QueryGetUserRequest{
+		Index: userId,
+	}
+	user, err := s.GetUser(&userReq)
 	if err != nil {
 		logrus.Error(err)
 		message := status.Convert(err).Message()
 		return false, xerrors.New(message)
 	}
 
-	//sig, err := cryptography.SignMessage("sdfsjflsdj", pubKey64)
-	//if err != nil {
-	//	message := status.Convert(err).Message()
-	//	return nil, xerrors.New(message)
-	//}
+	pubKeyBz, err := cryptography.ConvertBase64ToBytes(user.User.PubKey)
+	if err != nil {
+		logrus.Error(err)
+		message := status.Convert(err).Message()
+		return false, xerrors.New(message)
+	}
 
 	sigBz, err := cryptography.ConvertBase64ToBytes(sig)
 	if err != nil {
@@ -310,8 +318,6 @@ func (s *CosmosService) Verify(msg string, sig string, pubKey string) (bool, err
 		message := status.Convert(err).Message()
 		return false, xerrors.New(message)
 	}
-
-	logrus.Info(verifySig)
 
 	return verifySig, nil
 }
