@@ -12,7 +12,7 @@ build-image:
 	@docker build . --target=release -t supermedicalchain/side-service:pre-release
 
 push-image:
-	@docker tag supermedicalchain/side-service:pre-release supermedicalchain/side-service${TAG}
+	@docker tag supermedicalchain/side-service:pre-release supermedicalchain/side-service:${TAG}
 	@docker push supermedicalchain/side-service:${TAG}
 
 build:
