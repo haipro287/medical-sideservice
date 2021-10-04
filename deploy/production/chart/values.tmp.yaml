@@ -1,7 +1,7 @@
 replicaCount: 1
 revisionHistoryLimit: 1
 image:
-  repository: supermedicalchain/auth-service
+  repository: supermedicalchain/side-service
   tag: ${TAG}
   pullPolicy: Always
   resources:
@@ -15,7 +15,11 @@ livenessProbe:
   initialDelaySeconds: 30
   periodSeconds: 10
 service:
-  name: auth-service
+  name: side-service
+cosmos:
+  endpoint: ${COSMOS_ENDPOINT}
+  mnemonic: ${MNEMONIC}
+  chainId: ${CHAIN_ID}
 services:
   checkBody: ${CHECK_BODY}
   disableTracing: ${DISABLE_TRACING}
@@ -28,3 +32,4 @@ services:
   cleanDB: ${CLEAN_DB}
   logLevel: ${LOG_LEVEL}
   logFormat: ${LOG_FORMAT}
+  port: ${PORT}

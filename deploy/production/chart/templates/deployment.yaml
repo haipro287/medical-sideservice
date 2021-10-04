@@ -60,6 +60,14 @@ spec:
             value: {{ .Values.services.logFormat | default "json" | quote }}
           - name: DB_URI
             value: {{ .Values.services.dbUri | default "postgresql://root:root@cockroach-auth-cockroachdb:26257/defaultdb?sslmode=disable" | quote }}
+          - name: COSMOS_ENDPOINT
+            value: {{ .Values.cosmos.endpoint | default "json" | quote }}
+          - name: MNEMONIC
+            value: {{ .Values.cosmos.mnemonic | default "json" | quote }}
+          - name: CHAIN_ID
+            value: {{ .Values.cosmos.chainId | default "json" | quote }}
+          - name: PORT
+            value: {{ .Values.services.port | default "8080" | quote }}
       initContainers:
       - name: "init-{{ .Values.service.name }}"
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
