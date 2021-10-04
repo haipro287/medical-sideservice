@@ -7,6 +7,6 @@ metadata:
 spec:
   ports:
   - name: http
-    port: {{ .Values.service.port }}
+    port: {{ .Values.services.port }}
   selector:
     app: "{{ .Values.service.name }}-selector"
