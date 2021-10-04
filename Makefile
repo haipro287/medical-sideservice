@@ -13,7 +13,7 @@ build-image:
 
 push-image:
 	@docker tag supermedicalchain/side-service:pre-release supermedicalchain/side-service${TAG}
-	@docker push supermedicalchain/side-service${TAG}
+	@docker push supermedicalchain/side-service:${TAG}
 
 build:
 	@go build -o ./dist/server ./src
