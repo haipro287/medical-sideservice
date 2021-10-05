@@ -219,6 +219,8 @@ func (c *CosmosApi) HandleSignPost(g *gin.Context) {
 		response.ErrBadRequest(g, err)
 		return
 	}
+	logrus.Info(cryptography.ConvertBytesToBase64(keyBz))
+	logrus.Info(msg64)
 
 	res, err := c.cosmosService.Sign(msg64, cryptography.ConvertBytesToBase64(keyBz))
 	if err != nil {
