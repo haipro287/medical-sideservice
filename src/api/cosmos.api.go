@@ -69,6 +69,7 @@ func (c *CosmosApi) HandleServiceUserPost(g *gin.Context) {
 	msg64 := g.Query("message")
 	serviceUser := g.Query("serviceUser")
 
+	// decode base 64 url message query string
 	var msg pb.Message
 	decMsg, err := base64.RawURLEncoding.DecodeString(msg64)
 	if err != nil {
@@ -81,19 +82,33 @@ func (c *CosmosApi) HandleServiceUserPost(g *gin.Context) {
 		return
 	}
 
-	var req types.MsgCreateServiceUser
-	err = json.Unmarshal([]byte(msg.Message), &req)
+	//decode request from base64 url message
+	decReq, err := base64.RawURLEncoding.DecodeString(msg.Message)
 	if err != nil {
 		response.ErrBadRequest(g, err)
 		return
 	}
 
+	logrus.Info(string(decReq))
+
+	var req types.MsgCreateServiceUser
+
+	err = json.Unmarshal(decReq, &req)
+	if err != nil {
+		response.ErrBadRequest(g, err)
+		return
+	}
+
+	// verify sig
 	verified, err := c.cosmosService.Verify(msg.Message, msg.Signature, req.UserId)
 	if err != nil || !verified {
 		response.ErrUnauthorized(g, err)
 		return
 	}
 
+	logrus.Error(verified)
+
+	// add more data to request
 	req.ServiceUserId = serviceUser
 	info, err := c.cosmosService.ShowAccount("admin")
 	if err != nil {
@@ -135,8 +150,16 @@ func (c *CosmosApi) HandleCheckSharingGet(g *gin.Context) {
 		return
 	}
 
+	decReq, err := base64.RawURLEncoding.DecodeString(msg.Message)
+	if err != nil {
+		response.ErrBadRequest(g, err)
+		return
+	}
+
+	logrus.Info(string(decReq))
+
 	var req types.QueryCheckSharingRequest
-	err = json.Unmarshal([]byte(msg.Message), &req)
+	err = json.Unmarshal(decReq, &req)
 	if err != nil {
 		response.ErrBadRequest(g, err)
 		return
