@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	serviceName = "auth-service"
+	serviceName = "gateway-service"
 )
 
 func main() {
@@ -41,6 +41,12 @@ func makeApp() *cli.App {
 				Aliases: []string{"s"},
 				Usage:   "run server",
 				Action:  runMain,
+			},
+			{
+				Name:    "gen-mnemonic",
+				Aliases: []string{"g"},
+				Usage:   "generate new mnemonic phrase",
+				Action:  genMnemonic,
 			},
 			//{
 			//	Name:    "seed-data",
